@@ -40,4 +40,51 @@ production <- read_csv(
 
 We have a lot of data frames this week!
 
-The rest of this document will be filled in during the live session on Thursday.
+## Data cleanup
+```{r cleanup}
+production_cleaned <- production %>%
+  rename(
+    entity = Entity,
+    code = Code,
+    yr = Year, #Avoid conflict with the `year` function
+    balance_pelagic_fish = `Commodity Balances - Livestock and Fish Primary Equivalent - Pelagic Fish - 2763 - Production - 5510 - tonnes`,
+    balance_crustaceans = `Commodity Balances - Livestock and Fish Primary Equivalent - Crustaceans - 2765 - Production - 5510 - tonnes`,
+    balance_cephalopods = `Commodity Balances - Livestock and Fish Primary Equivalent - Cephalopods - 2766 - Production - 5510 - tonnes`,
+    balance_demersal_fish = `Commodity Balances - Livestock and Fish Primary Equivalent - Demersal Fish - 2762 - Production - 5510 - tonnes`,
+    balance_freshwater_fish = `Commodity Balances - Livestock and Fish Primary Equivalent - Freshwater Fish - 2761 - Production - 5510 - tonnes`,
+    balance_other_molluscs = `Commodity Balances - Livestock and Fish Primary Equivalent - Molluscs, Other - 2767 - Production - 5510 - tonnes`,
+    balance_other_marine_fish = `Commodity Balances - Livestock and Fish Primary Equivalent - Marine Fish, Other - 2764 - Production - 5510 - tonnes`
+  )
+
+production_longer <- production_cleaned %>%
+  pivot_longer(
+    starts_with("balance"),
+    names_to = "marine_type",
+    values_to = "balance",
+    names_prefix = "balance_"
+  ) %>%
+  mutate(
+    marine_type = marine_type %>%
+      str_to_sentence() %>%
+      str_replace_all(pattern = "_", replacement = " ")
+  )
+```
+
+```{r fish-or-not}
+fish_or_not_totals <- production_longer %>%
+  mutate(
+    is_fish = if_else(
+      marine_type %in% c("Crustaceans", "Cephalopods", "Other molluscs"),
+      true = "Total not fish",
+      false = "Total fish"
+    )
+  ) %>%
+  group_by(entity, code, yr, is_fish) %>%
+  summarise(balance = sum(balance)) %>%
+  rename(marine_type = is_fish)
+
+production_with_totals <- production_longer %>%
+  bind_rows(fish_or_not_totals) %>%
+  arrange(entity, code, yr) %>%
+  filter(entity == "Africa")
+```
