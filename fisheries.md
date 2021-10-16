@@ -5,6 +5,7 @@ Alex Homer
 
 ``` r
 library(tidyverse)
+library(scales)
 #This document also requires the `emo` package, for emoji.  To install it if
 #necessary, make sure `devtools` is installed, then run
 # devtools::install_github("hadley/emo")
@@ -239,6 +240,8 @@ able to deal with such detailed requirements via any automatic functions
 [2], so we’re just going to have to specify our colours and line types
 manually.
 
+At the same time, we’ll make the scale on the *y*-axis look a bit nicer.
+
 ``` r
 production_continents <- production_with_totals %>%
   filter(entity %in% continents) 
@@ -277,6 +280,7 @@ production_continents %>%
   ) +
   geom_line() +
   facet_wrap(~entity) +
+  scale_y_continuous(labels = label_number(scale = 1e-6, suffix = " M")) +
   scale_colour_manual(
     values = c(
       "Freshwater fish" = fishcol,
@@ -315,7 +319,8 @@ production_continents %>%
       max(production_continents$yr)),
     caption = "Source: OurWorldinData.org/Hannah Ritchie/Max Roser"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.title.y = element_text(vjust = 2.5)) #Nudge y label to the left
 ```
 
 ![](fisheries_files/figure-gfm/graph-with-totals-manual-1.png)<!-- -->

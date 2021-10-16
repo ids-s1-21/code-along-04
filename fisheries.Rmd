@@ -9,6 +9,7 @@ editor_options:
 
 ```{r load-packages, message = FALSE}
 library(tidyverse)
+library(scales)
 #This document also requires the `emo` package, for emoji.  To install it if
 #necessary, make sure `devtools` is installed, then run
 # devtools::install_github("hadley/emo")
@@ -208,6 +209,8 @@ Okay, so this is great and all, but I'm not sure it's what I wanted.  It's a bit
 
 Actually, what would be really cool would be to have the fish and the non-fish shown in two different colours, and the different types of fish making up each indicated by line types.  Unfortunately, `ggplot2` isn't able to deal with such detailed requirements via any automatic functions ^[Maybe in `ggplot7`...], so we're just going to have to specify our colours and line types manually.
 
+At the same time, we'll make the scale on the $y$-axis look a bit nicer.
+
 ```{r graph-with-totals-manual}
 production_continents <- production_with_totals %>%
   filter(entity %in% continents) 
@@ -246,6 +249,7 @@ production_continents %>%
   ) +
   geom_line() +
   facet_wrap(~entity) +
+  scale_y_continuous(labels = label_number(scale = 1e-6, suffix = " M")) +
   scale_colour_manual(
     values = c(
       "Freshwater fish" = fishcol,
@@ -284,7 +288,8 @@ production_continents %>%
       max(production_continents$yr)),
     caption = "Source: OurWorldinData.org/Hannah Ritchie/Max Roser"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.title.y = element_text(vjust = 2.5)) #Nudge y label to the left
 ```
 
 `r lightbulb("Is there a better way to display this?  (The answer is almost certainly \"yes\"---I won't have found the optimal way---but which way is best is an open question.)")`
