@@ -320,7 +320,8 @@ production_continents %>%
     caption = "Source: OurWorldinData.org/Hannah Ritchie/Max Roser"
   ) +
   theme_minimal() +
-  theme(axis.title.y = element_text(vjust = 2.5)) #Nudge y label to the left
+  #Nudge y label to the left by giving it a margin on the right
+  theme(axis.title.y = element_text(margin = margin(r = 6))) 
 ```
 
 ![](fisheries_files/figure-gfm/graph-with-totals-manual-1.png)<!-- -->

@@ -289,7 +289,8 @@ production_continents %>%
     caption = "Source: OurWorldinData.org/Hannah Ritchie/Max Roser"
   ) +
   theme_minimal() +
-  theme(axis.title.y = element_text(vjust = 2.5)) #Nudge y label to the left
+  #Nudge y label to the left by giving it a margin on the right
+  theme(axis.title.y = element_text(margin = margin(r = 6))) 
 ```
 
 `r lightbulb("Is there a better way to display this?  (The answer is almost certainly \"yes\"---I won't have found the optimal way---but which way is best is an open question.)")`
